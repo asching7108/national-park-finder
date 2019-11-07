@@ -10,7 +10,9 @@ button, input[type="text"] {
   padding: 5px;
 }
 
-button:hover {
+button:hover, 
+.dropdown-content li:hover,
+.state-item {
   cursor: pointer;
 }
 
@@ -23,6 +25,54 @@ button:hover {
     color: red;
 }
 
+.searchbtn {
+  display: block;
+  margin: 0 auto;
+}
+
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: absolute;
+  margin-top: 20px;
+}
+
+.dropbtn {
+  width: 100px;
+  height: 20px;
+  border: 1px solid grey;
+  border-radius: 0;
+}
+
+.dropdown-content {
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 100px;
+  position: relative;
+}
+
+.dropdown-content li {
+  text-align: center;
+  background-color: white;
+  border: 1px solid lightgrey;
+}
+
 .hidden {
   display: none;
+}
+
+.addedStates {
+  display: block;
+  margin: 50px auto 10px;
+}
+
+.state-item {
+  display: inline-block;
+  text-align: center;
+  width: 50px;
+  border: 1px solid lightgrey;
 }

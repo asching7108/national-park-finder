@@ -4,7 +4,13 @@ const apiKey = 'VGVQ4CiJE0afId5aJCo75ac3AbARFt5AjQ79HkhS';
 
 const searchURL = 'https://developer.nps.gov/api/v1/parks';
 
-function getNationalParks(searchTerm, maxResults = 10) {
+const stateCode = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
+  'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI',
+  'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH',
+  'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV',
+  'WI', 'WY'];
+
+function getNationalParks(searchTerm, maxResults = 10, selectedStates) {
   const params = {
     q: searchTerm,
     limit: maxResults,
@@ -16,7 +22,7 @@ function getNationalParks(searchTerm, maxResults = 10) {
       'X-Api-Key': 'VGVQ4CiJE0afId5aJCo75ac3AbARFt5AjQ79HkhS'
     })
   }; */
-  const url = searchURL + '?' + formatQueryParams(params);
+  const url = searchURL + '?' + formatQueryParams(params, selectedStates);
   fetch(url)
     .then(response => {
       if (response.ok) {
@@ -30,15 +36,21 @@ function getNationalParks(searchTerm, maxResults = 10) {
     });
 }
 
-function formatQueryParams(params) {
+function formatQueryParams(params, selectedStates) {
   const queryItems = Object.keys(params)
     .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
+    if (selectedStates.length) {
+      for (let i = 0; i < selectedStates.length; i++) {
+        queryItems[queryItems.length] = `stateCode=${selectedStates[i]}`;
+      }
+    }
     return queryItems.join('&');
 }
 
 function displayResults(responseJson) {
   $('#results-list').empty();
   for (let i = 0; i < responseJson.data.length; i ++) {
+    console.log(responseJson.data[i].fullName);
     $('#results-list').append(
       `<li><h3>${responseJson.data[i].fullName}</h3>
       <p>${responseJson.data[i].description}</p>
@@ -46,15 +58,52 @@ function displayResults(responseJson) {
       </li>`
     );
   }
+  $('#results').removeClass('hidden');
+}
+
+function addState(state, selectedStates) {
+  if ($(`#${state}`).length) {
+    return;
+  }
+  $('.addedStates').append(`<span class="state-item" id="${state}">${state}</span>`);
+  selectedStates[selectedStates.length] = state;
+  $('.dropdown-content').toggleClass('hidden');
+}
+
+function removeState(state, selectedStates) {
+  $('.addedStates').find(`#${state}`).remove();
+  for (let i = 0; i < selectedStates.length; i++) {
+    if (selectedStates[i] == state) {
+      selectedStates[i] = selectedStates[selectedStates.length - 1];
+      selectedStates.pop();
+    }
+  }
 }
 
 function watchForm() {
+  const selectedStates = [];
+  $('.dropbtn').click(event => {
+    $('.dropdown-content').toggleClass('hidden');
+  });
+  $('.dropdown-content').click(event => {
+    addState($(event.target).text(), selectedStates);
+  });
+  $('.addedStates').click(event => {
+    removeState($(event.target).text(), selectedStates);
+  });
   $('#js-form').submit(event => {
     event.preventDefault();
     const searchTerm = $('#js-search-term').val();
     const maxResults = $('#js-max-results').val();
-    getNationalParks(searchTerm, maxResults);
+    getNationalParks(searchTerm, maxResults, selectedStates);
   });
 }
 
+function fillDropdownContent(stateCode) {
+  for (let i = 0; i < stateCode.length; i++) {
+    $('.dropdown-content').append(`<li class="dropdown-item">${stateCode[i]}</li>`);
+  }
+}
+
 $(watchForm);
+$(fillDropdownContent(stateCode));
