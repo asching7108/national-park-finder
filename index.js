@@ -49,6 +49,9 @@ function formatQueryParams(params, selectedStates) {
 
 function displayResults(responseJson) {
   $('#results-list').empty();
+  if (responseJson.total == 0) {
+    $('#results-list').append('<li><h3>No matched result.</h3></li>');
+  }
   for (let i = 0; i < responseJson.data.length; i ++) {
     console.log(responseJson.data[i].fullName);
     $('#results-list').append(
