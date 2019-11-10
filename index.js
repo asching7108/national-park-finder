@@ -16,13 +16,17 @@ function getNationalParks(searchTerm, maxResults = 10, selectedStates) {
     limit: maxResults,
     api_key: apiKey
   };
+  if (selectedStates.length) {
+    params.stateCode = selectedStates.join(',');
+  }
   /* doesn't work
   const options = {
     headers: new Headers({
       'X-Api-Key': 'VGVQ4CiJE0afId5aJCo75ac3AbARFt5AjQ79HkhS'
     })
   }; */
-  const url = searchURL + '?' + formatQueryParams(params, selectedStates);
+  const url = searchURL + '?' + formatQueryParams(params);
+  console.log(url);
   fetch(url)
     .then(response => {
       if (response.ok) {
@@ -36,14 +40,9 @@ function getNationalParks(searchTerm, maxResults = 10, selectedStates) {
     });
 }
 
-function formatQueryParams(params, selectedStates) {
+function formatQueryParams(params) {
   const queryItems = Object.keys(params)
     .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
-    if (selectedStates.length) {
-      for (let i = 0; i < selectedStates.length; i++) {
-        queryItems[queryItems.length] = `stateCode=${selectedStates[i]}`;
-      }
-    }
     return queryItems.join('&');
 }
 
@@ -53,7 +52,6 @@ function displayResults(responseJson) {
     $('#results-list').append('<li><h3>No matched result.</h3></li>');
   }
   for (let i = 0; i < responseJson.data.length; i ++) {
-    console.log(responseJson.data[i].fullName);
     $('#results-list').append(
       `<li><h3>${responseJson.data[i].fullName}</h3>
       <p>${responseJson.data[i].description}</p>
